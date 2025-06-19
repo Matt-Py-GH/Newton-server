@@ -7,27 +7,23 @@ dotenv.config()
 
 async function Login(req, res){
     console.log("Petición de inicio de sesión recibida");
+
     const {user, password} = req.body
-    if(!user || !password){
-        return res.status(400).send({status:"Error", message:"Campos incompletos"})
-    }
+
+    if(!user || !password) return res.status(400).send({status:"Error", message:"Campos incompletos"})
 
     const resultado = await query('SELECT * FROM usuarios WHERE name = $1', [user]);
 
-    if (resultado.rowCount === 0) {
-        return res.status(400).send({ status: "Error", message: "Usuario no encontrado" });
-      }
+    if (resultado.rowCount === 0) return res.status(400).send({ status: "Error", message: "Usuario no encontrado" });
       
     const usuarioBD = resultado.rows[0];
 
     const passwordCorrecta = await bcryptjs.compare(password, usuarioBD.password);
-
-    if (!passwordCorrecta) {
-        return res.status(400).send({ status: "Error", message: "Contraseña incorrecta" });
-      }
+    
+    if (!passwordCorrecta) return res.status(400).send({ status: "Error", message: "Contraseña incorrecta" });
 
     const token = jsonwebtoken.sign(
-        {user, id:usuarioBD.id},
+        {user, id:usuarioBD.id}, //Sospechando el funcionamiento correcto de esta línea
         process.env.JWT_SIGN,
         {expiresIn: Number(process.env.JWT_EXPIRE) * 24 * 60 * 60 * 1000}
     )
