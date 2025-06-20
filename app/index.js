@@ -3,9 +3,7 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 
 import { methods as auth } from './controllers/controller.js';
-// import { middleware } from './middleware/middleware.js';
-
-import { query } from './model/model.js';
+import { methods as middleware } from './middleware/middleware.js';
 
 
 //Creación del servidor
@@ -21,3 +19,19 @@ server.use(cookieParser())
 
 server.post("/api/users", auth.Register)
 server.post("/api/login", auth.Login)
+
+
+server.get('/api/logout', (req, res) => {
+  res.clearCookie('jwt', { path: '/' })
+  res.status(200).json({ message: 'Logged out' })
+})
+
+server.get("/api/home", middleware.GetUserFromToken, (req, res) => {
+  console.log(res.message);
+  res.status(200).json({
+    status: "OK",
+    message: "Usuario autenticado",
+    user: req.user,
+  });
+  console.log(res.message)
+});

@@ -19,8 +19,10 @@ async function Login(req, res){
     const usuarioBD = resultado.rows[0];
 
     const passwordCorrecta = await bcryptjs.compare(password, usuarioBD.password);
+    console.log("HASTA ACÁ LLEGA")
     
     if (!passwordCorrecta) return res.status(400).send({ status: "Error", message: "Contraseña incorrecta" });
+
 
     const token = jsonwebtoken.sign(
         {user, id:usuarioBD.id}, //Sospechando el funcionamiento correcto de esta línea
